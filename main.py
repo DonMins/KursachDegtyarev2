@@ -125,13 +125,13 @@ def getparams():
     return parameter_array
 
 
-def drawUIT(da, eps,colSlag):
+def drawUIT(da, eps,stepr,stept):
     data = [dict(
     visible=False,
     line=dict(color='#ff0000', width=2),
     name='t = ' + str(step),
     x=np.arange(0, da['R']+0.1, 0.1),
-    y=[u(t, step, eps,colSlag) for t in np.arange(0, da['R']+0.1, 0.1)]) for step in
+    y=[u(t, step, eps,0) for t in np.arange(0, da['R']+0.1, 0.1)]) for step in
     np.arange(da['T']+1)]
     steps = []
     for i in range(len(data)):
@@ -146,35 +146,17 @@ def drawUIT(da, eps,colSlag):
     pad={"t": 50},
     steps=steps
     )]
+    data2 = [dict(
+        visible=False,
+        line=dict(color='#ff1240', width=2),
+        x =[st for st in np.arange(0, parameter_array['R'], stepr)],
+        args=(stepr, stept, [st for st in np.arange(0, parameter_array['R'], stepr)]),
+        y2=[ImplicitScheme.xOy(args)[int(curtime / stept)] for curtime in np.arange(0, parameter_array['R'] + 1, 1)])]
     layout = dict(sliders=sliders)
     fig = dict(data=data, layout=layout)
-    py.plot(fig, filename='Temperature in time.html')
+    fig2 = dict(data=data2, layout=layout)
 
-def drawUIR(da, eps,colSlag):
-    data = [dict(
-    visible=False,
-    line=dict(color='#ff0000', width=2),
-    name='r = ' + str(step),
-    x=np.arange(da['T']),
-    y=[u(step, t, eps,colSlag) for t in np.arange(da['T']+1)]) for step in np.arange(0, da['R']+0.1, 0.1)]
-
-    steps = []
-
-    for i in range(len(data)):
-        step = dict(
-            method='restyle',
-            args=['visible', [False] * len(data)])
-        step['args'][1][i] = True  # Toggle i'th trace to "visible"
-        steps.append(step)
-    sliders = [dict(
-    active=10,
-    currentvalue={"prefix": "Radius: "},
-    pad={"t": 50},
-    steps=steps
-    )]
-    layout = dict(sliders=sliders)
-    fig = dict(data=data, layout=layout)
-    py.plot(fig, filename='Temperature in radius.html')
+    py.plot(fig2, filename='time.html')
 
 
 if __name__ == '__main__':
@@ -184,52 +166,39 @@ if __name__ == '__main__':
     print("alfa = {0} c = {1} betta = {2}".format(parameter_array['alf'], parameter_array['c'], parameter_array['betta']))
     print("P = {0}, a = {1}".format(parameter_array['P'], parameter_array['a']))
 
-    yes = input("Введите +, если хотите изменить параметры  иначе - ")
-    if yes.upper() == "YES":
-        R = input("Введите R ")
-        l = input("Введите l ")
-        k = input("Введите k ")
-        alfa = input("Введите alfa ")
-        c = input("Введите c ")
-        betta = input("Введите betta ")
-        P = input("Введите P ")
-        parameter_array['R'] = float(R)
-        parameter_array['l'] = float(l)
-        parameter_array['k'] = float(k)
-        parameter_array['alf'] = float(alfa)
-        parameter_array['c'] = float(c)
-        parameter_array['betta'] = float(betta)
-        parameter_array['P'] = float(P)
-        parameter_array['a'] = float(R) / 4
-
-    stepr = 4/int(input("Введите количество шагов по R "))
-    stept = 180/int(input('и по T '))
+    stepr = parameter_array['R']/int(input("Введите количество шагов по R "))
+    stept = parameter_array['T']/int(input('и по T '))
     curtime = int(input("Введите момент времени "))
     print("Подождите, пожалуйста, выполняются вычисления...")
-    riarr = [st for st in np.arange(0, 4 , stepr)]
 
-
+    riarr = [st for st in np.arange(0, parameter_array['R'], stepr)]
     args =(stepr, stept, riarr)
-    tt = time.time()
+    t1= time.time()
+
     impicit = ImplicitScheme.xOy(args)
-    print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - tt))
+    print(len(impicit))
+    print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - t1))
 
     t2 = time.time()
     explicit = ExplictitScheme.xOy(args)
     print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
 
-    y1 = [u(step,curtime, 0.01,0) for step in riarr]
-    y2 = impicit[int(curtime / stept)]
-    y3 = explicit[int(curtime / stept)]
-    ln0, ln1, ln2 = mpl.plot(riarr,y2,riarr,y1,riarr,y3)
-    mpl.legend((ln0, ln1, ln2), ('Неявная', 'Аналитическое', "Явная"),
-               title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
-                     'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
-                                                        parameter_array['alf'], parameter_array['c'],
-                                                        parameter_array['betta'],
-                                                        parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
+    drawUIT(parameter_array,0.01,stepr,stept)
 
-    mpl.xlabel('Radius')
-    mpl.ylabel('Temperature')
-    mpl.grid()
-    mpl.show()
+
+
+    # y1 = [u(step,curtime, 0.01,0) for step in riarr]
+    # y2 = impicit[int(curtime / stept)]
+    # y3 = explicit[int(curtime / stept)]
+    # ln0, ln1, ln2 = mpl.plot(riarr,y2,riarr,y1,riarr,y3)
+    # mpl.legend((ln0, ln1, ln2), ('Неявная', 'Аналитическое', "Явная"),
+    #            title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
+    #                  'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
+    #                                                     parameter_array['alf'], parameter_array['c'],
+    #                                                     parameter_array['betta'],
+    #                                                     parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
+    #
+    # mpl.xlabel('Радиус')
+    # mpl.ylabel('Tемпература')
+    # mpl.grid()
+    # mpl.show()
