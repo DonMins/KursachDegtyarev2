@@ -45,9 +45,9 @@ def all(w, ht, hr, ris):
     cur.append(wI(hr, w[len-1]))
     return cur
 
-def xOy(args):
+def xOy(stepr, stept, riarr):
 
-    stepr, stept, riarr = args[0], args[1], args[2]
+   # stepr, stept, riarr = args[0], args[1], args[2]
     res = [np.zeros((riarr.__len__(), 1))]
     for k in np.arange(1, int(180 / stept), 1):
         res.append(all(res[k - 1], stept, stepr, riarr))

@@ -125,35 +125,30 @@ def getparams():
     return parameter_array
 
 
-def drawUIT(da, eps,stepr,stept):
-    data = [dict(
-    visible=False,
-    line=dict(color='#ff0000', width=2),
-    name='t = ' + str(step),
-    x=np.arange(0, da['R']+0.1, 0.1),
-    y=[u(t, step, eps,0) for t in np.arange(0, da['R']+0.1, 0.1)]) for step in
-    np.arange(da['T']+1)]
-    steps = []
-    for i in range(len(data)):
-        step = dict(
-            method='restyle',
-            args=['visible', [False] * len(data)])
-        step['args'][1][i] = True # Toggle i'th trace to "visible"
-        steps.append(step)
-    sliders = [dict(
-    active=10,
-    currentvalue={"prefix": "Time: "},
-    pad={"t": 50},
-    steps=steps
-    )]
+def drawUIT(da, eps,stept,stepr,riarr):
+    args = (stepr, stept, riarr)
     data2 = [dict(
         visible=False,
         line=dict(color='#ff1240', width=2),
         x =[st for st in np.arange(0, parameter_array['R'], stepr)],
-        args=(stepr, stept, [st for st in np.arange(0, parameter_array['R'], stepr)]),
-        y2=[ImplicitScheme.xOy(args)[int(curtime / stept)] for curtime in np.arange(0, parameter_array['R'] + 1, 1)])]
+        y=[ExplictitScheme.xOy(stepr,stept,st)[int(step / stept)] for st in np.arange(0, parameter_array['R'], stepr)])
+        for step in np.arange(0, parameter_array['T'], 1)]
+
+    steps = []
+    for i in range(len(data2)):
+        step = dict(
+            method='restyle',
+            args=['visible', [False] * len(data2)])
+        step['args'][1][i] = True  # Toggle i'th trace to "visible"
+        steps.append(step)
+    sliders = [dict(
+        active=10,
+        currentvalue={"prefix": "Time: "},
+        pad={"t": 50},
+        steps=steps
+    )]
     layout = dict(sliders=sliders)
-    fig = dict(data=data, layout=layout)
+
     fig2 = dict(data=data2, layout=layout)
 
     py.plot(fig2, filename='time.html')
@@ -180,10 +175,10 @@ if __name__ == '__main__':
     print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - t1))
 
     t2 = time.time()
-    explicit = ExplictitScheme.xOy(args)
+    explicit = ExplictitScheme.xOy(stepr, stept, riarr)
     print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
 
-    drawUIT(parameter_array,0.01,stepr,stept)
+    drawUIT(parameter_array,0.01,stept,stepr,riarr)
 
 
 
