@@ -12,7 +12,6 @@ def I_r(ri):
         return a
     return 0
 
-
 # Элементы из первой замены
 d = (2 * parameter_array['alf']) / (parameter_array['c'] * parameter_array['l'])
 

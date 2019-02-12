@@ -125,34 +125,6 @@ def getparams():
     return parameter_array
 
 
-def drawUIT(da, eps,stept,stepr,riarr):
-    args = (stepr, stept, riarr)
-    data2 = [dict(
-        visible=False,
-        line=dict(color='#ff1240', width=2),
-        x =[st for st in np.arange(0, parameter_array['R'], stepr)],
-        y=[ExplictitScheme.xOy(stepr,stept,st)[int(step / stept)] for st in np.arange(0, parameter_array['R'], stepr)])
-        for step in np.arange(0, parameter_array['T'], 1)]
-
-    steps = []
-    for i in range(len(data2)):
-        step = dict(
-            method='restyle',
-            args=['visible', [False] * len(data2)])
-        step['args'][1][i] = True  # Toggle i'th trace to "visible"
-        steps.append(step)
-    sliders = [dict(
-        active=10,
-        currentvalue={"prefix": "Time: "},
-        pad={"t": 50},
-        steps=steps
-    )]
-    layout = dict(sliders=sliders)
-
-    fig2 = dict(data=data2, layout=layout)
-
-    py.plot(fig2, filename='time.html')
-
 
 if __name__ == '__main__':
     parameter_array = getparams()
@@ -175,25 +147,23 @@ if __name__ == '__main__':
     print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - t1))
 
     t2 = time.time()
-    explicit = ExplictitScheme.xOy(stepr, stept, riarr)
+
+    #explicit = ExplictitScheme.xOy(args)
     print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
 
-    drawUIT(parameter_array,0.01,stept,stepr,riarr)
 
+    y1 = [u(step,curtime, 0.01,0) for step in riarr]
+    y2 = impicit[int(curtime / stept)]
+    #y3 = explicit[int(curtime / stept)]
+    ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
+    mpl.legend((ln0, ln1), ('Неявная', 'Аналитическое', "Явная"),
+               title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
+                     'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
+                                                        parameter_array['alf'], parameter_array['c'],
+                                                        parameter_array['betta'],
+                                                        parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
 
-
-    # y1 = [u(step,curtime, 0.01,0) for step in riarr]
-    # y2 = impicit[int(curtime / stept)]
-    # y3 = explicit[int(curtime / stept)]
-    # ln0, ln1, ln2 = mpl.plot(riarr,y2,riarr,y1,riarr,y3)
-    # mpl.legend((ln0, ln1, ln2), ('Неявная', 'Аналитическое', "Явная"),
-    #            title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
-    #                  'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
-    #                                                     parameter_array['alf'], parameter_array['c'],
-    #                                                     parameter_array['betta'],
-    #                                                     parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
-    #
-    # mpl.xlabel('Радиус')
-    # mpl.ylabel('Tемпература')
-    # mpl.grid()
-    # mpl.show()
+    mpl.xlabel('Радиус')
+    mpl.ylabel('Tемпература')
+    mpl.grid()
+    mpl.show()
