@@ -199,25 +199,25 @@ def plot_eps(x,y):
 
     plt.show()
 
-X = [0.0000001,0.000001,0.00001,0.0001,0.001,0.01,0.1]
-Y=[2202,877,347,137,52,18,7]
-
-yt = 0.0000001
-st = -8
-i =0
-while (yt<=10**-1):
-    Ynew.append(experimental_eps(0,180,yt,parameter_array))
-    NMAX[0]=0
-    Xnew.append(yt)
-    yt= yt + 9*10**st
-    i=i+1
-    if(i==9):
-        st=st+1
-        i=0
-        yt=10**(st+1)
-
-
-plot_eps(X,Y)
+# X = [0.0000001,0.000001,0.00001,0.0001,0.001,0.01,0.1]
+# Y=[2202,877,347,137,52,18,7]
+#
+# yt = 0.0000001
+# st = -8
+# i =0
+# while (yt<=10**-1):
+#     Ynew.append(experimental_eps(0,180,yt,parameter_array))
+#     NMAX[0]=0
+#     Xnew.append(yt)
+#     yt= yt + 9*10**st
+#     i=i+1
+#     if(i==9):
+#         st=st+1
+#         i=0
+#         yt=10**(st+1)
+#
+#
+# plot_eps(X,Y)
 
 
 exit = 0
