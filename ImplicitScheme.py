@@ -43,11 +43,11 @@ def pi(hr, ht, ri):
 
 
 def hi(ht, hr, ri):
-    return -gamma(ht, hr) + gamma(ht, hr) * hr / ri
+    return gamma(ht, hr) - (gamma(ht, hr) * hr) / (2*ri)
 
 
 def qi(ht, hr, ri):
-    return gamma(ht, hr) - gamma(ht, hr) * hr / ri
+    return gamma(ht, hr) + (gamma(ht, hr) * hr )/( 2*ri)
 
 
 def si(u, ri, ht):
@@ -86,9 +86,9 @@ def xOy(args):
 
         # остальная система
         for i in np.arange(1, len-1, 1):
-            u[i, i - 1] = hi(stept, stepr, riarr[i])
+            u[i, i - 1] = -1*hi(stept, stepr, riarr[i])
             u[i, i] = pi(stepr, stept, riarr[i])
-            u[i, i + 1] = qi(stept, stepr, riarr[i])
+            u[i, i + 1] = -1*qi(stept, stepr, riarr[i])
 
         temp = [i for i in np.linalg.solve(u, s).flat]
         temp.append(temp[len-1])
