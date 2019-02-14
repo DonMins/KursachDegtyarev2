@@ -39,27 +39,30 @@ def s0(u, ht):
 
 
 def pi(hr, ht, ri):
-    return 1 + 2 * gamma(ht, hr) - gamma(ht, hr) * hr / ri + d * ht
+    return 1 + 2 * gamma(ht, hr) + d * ht
 
 
 def hi(ht, hr, ri):
-    return gamma(ht, hr) - gamma(ht, hr) * hr / ri
+    return -gamma(ht, hr) + gamma(ht, hr) * hr / ri
 
 
 def qi(ht, hr, ri):
-    return gamma(ht, hr)
+    return gamma(ht, hr) - gamma(ht, hr) * hr / ri
 
 
 def si(u, ri, ht):
     return u + ht * f_ri(ri)
 
+def hI(ht, hr, ri):
+    return 2*gamma(ht, hr)
+
 
 def xOy(args):
 
     stepr, stept, riarr = args[0], args[1], args[2]
-    res = [np.zeros(riarr.__len__()), ]
+    res = [np.zeros(riarr.__len__())]
     for k in np.arange(1, int(180 / stept), 1):
-        len = riarr.__len__() - 1
+        len = riarr.__len__()-1
         ss = []
         j = 0
         for ri in riarr[0:len]:
@@ -78,17 +81,18 @@ def xOy(args):
         # граничные условия
         u[0, 0] = p0(stept, stepr)
         u[0, 1] = -1 * q0(stept, stepr)
-        u[len - 1, len - 2] = -1 * hi(stepr, stept, riarr[len - 1])
-        u[len - 1, len - 1] = pi(stept, stepr, riarr[len - 1])
+        u[len-1, len-1] = pi(stepr, stept, riarr[len-1])
+        u[len-1, len-2] = -1*hI(stept, stepr, riarr[len-1])
 
         # остальная система
-        for i in np.arange(1, len - 1, 1):
-            u[i, i - 1] = -1 * hi(stept, stepr, riarr[i])
+        for i in np.arange(1, len-1, 1):
+            u[i, i - 1] = hi(stept, stepr, riarr[i])
             u[i, i] = pi(stepr, stept, riarr[i])
-            u[i, i + 1] = -1 * qi(stept, stepr, riarr[i])
+            u[i, i + 1] = qi(stept, stepr, riarr[i])
 
         temp = [i for i in np.linalg.solve(u, s).flat]
-        temp.append(temp[len - 1])
+        temp.append(temp[len-1])
         res.append(temp)
+
 
     return res
