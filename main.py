@@ -257,16 +257,17 @@ if __name__ == '__main__':
                 print("Вы должны ввести целое положительное число , попробуйте снова.")
 
         stept = parameter_array['T']/a
+
         while True:
             try:
-                a = int(input("Введите момент времени "))
-                if(a <= 0):
-                    print("Вы должны ввести целое положительное число , попробуйте снова.")
+                b = int(input("Введите момент времени "))
+                if(b <= 0 | b > a):
+                    print("Вы должны ввести целое положительное число не больше T , попробуйте снова.")
                 else:
                     break
             except ValueError:
-                print("Вы должны ввести целое положительное число , попробуйте снова.")
-        curtime = a
+                print("Вы должны ввести целое положительное число не больше T, попробуйте снова.")
+        curtime = b
         print("Подождите, пожалуйста, выполняются вычисления...")
 
         riarr = [st for st in np.arange(0, parameter_array['R'], stepr)]
@@ -281,23 +282,38 @@ if __name__ == '__main__':
 
             #explicit = ExplictitScheme.xOy(args)
         print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
+        moment=0
+        while(moment == 0):
+            y1 = [u(step,curtime, 0.01,0) for step in riarr]
+            y2 = impicit[int(curtime / stept)]
+            #y2 = explicit[int(curtime / stept)]
+            ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
+            mpl.legend((ln0, ln1), ('явная', 'Аналитическое', "Явная"),
+                       title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
+                             'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
+                                                                parameter_array['alf'], parameter_array['c'],
+                                                                parameter_array['betta'],
+                                                                parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
+
+            mpl.xlabel('Радиус')
+            mpl.ylabel('Tемпература')
+            mpl.grid()
+            mpl.show()
+
+            moment = int(input("Для ввода нового момента времени - 1 , для продолжения работы - 0"))
+            if(moment ==0):
+                while True:
+                    try:
+                        b = int(input("Введите момент времени "))
+                        if(b <= 0 | b > a):
+                            print("Вы должны ввести целое положительное число не больше T , попробуйте снова.")
+                        else:
+                            break
+                    except ValueError:
+                        print("Вы должны ввести целое положительное число не больше T, попробуйте снова.")
+                curtime = b
 
 
-        y1 = [u(step,curtime, 0.01,0) for step in riarr]
-        y2 = impicit[int(curtime / stept)]
-        #y2 = explicit[int(curtime / stept)]
-        ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
-        mpl.legend((ln0, ln1), ('явная', 'Аналитическое', "Явная"),
-                   title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
-                         'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
-                                                            parameter_array['alf'], parameter_array['c'],
-                                                            parameter_array['betta'],
-                                                            parameter_array['P'], parameter_array['a'], stepr, stept, curtime))
-
-        mpl.xlabel('Радиус')
-        mpl.ylabel('Tемпература')
-        mpl.grid()
-        mpl.show()
         exit = int(input("Для выхода нажмите - 1 , чтобы продолжить - 0"))
         dataChanged[0]=0
     print("-------------------------------------------------------------------------------------")
