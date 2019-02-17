@@ -260,6 +260,16 @@ if __name__ == '__main__':
 
         while True:
             try:
+                eps = float(input("Введите количество eps "))
+                if(a <= 0):
+                    print("Вы должны ввести положительное число , попробуйте снова.")
+                else:
+                    break
+            except ValueError:
+                print("Вы должны ввести положительное число , попробуйте снова.")
+
+        while True:
+            try:
                 b = int(input("Введите момент времени "))
                 if(b <= 0 | b > a):
                     print("Вы должны ввести целое положительное число не больше T , попробуйте снова.")
@@ -284,7 +294,7 @@ if __name__ == '__main__':
         print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
         moment=0
         while(moment == 0):
-            y1 = [u(step,curtime, 0.01,0) for step in riarr]
+            y1 = [u(step,curtime, eps,0) for step in riarr]
             y2 = impicit[int(curtime / stept)]
             #y2 = explicit[int(curtime / stept)]
             ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
@@ -300,7 +310,7 @@ if __name__ == '__main__':
             mpl.grid()
             mpl.show()
 
-            moment = int(input("Для ввода нового момента времени - 1 , для продолжения работы - 0"))
+            moment = int(input("Для ввода нового момента времени - 0 , для продолжения работы - 1"))
             if(moment ==0):
                 while True:
                     try:
