@@ -271,7 +271,7 @@ if __name__ == '__main__':
         while True:
             try:
                 b = int(input("Введите момент времени "))
-                if(b <= 0 | b > a):
+                if(b <= 0 | b > parameter_array['T']):
                     print("Вы должны ввести целое положительное число не больше T , попробуйте снова.")
                 else:
                     break
@@ -315,7 +315,7 @@ if __name__ == '__main__':
                 while True:
                     try:
                         b = int(input("Введите момент времени "))
-                        if(b <= 0 | b > a):
+                        if(b <= 0 | b > parameter_array['T']):
                             print("Вы должны ввести целое положительное число не больше T , попробуйте снова.")
                         else:
                             break
