@@ -280,7 +280,8 @@ if __name__ == '__main__':
         curtime = b
         print("Подождите, пожалуйста, выполняются вычисления...")
 
-        riarr = [st for st in np.arange(0, parameter_array['R'], stepr)]
+        riarr = [st for st in np.arange(0, parameter_array['R']+stepr, stepr)]
+        print(riarr)
         args =(stepr, stept, riarr)
         t1= time.time()
 
@@ -296,7 +297,11 @@ if __name__ == '__main__':
         while(moment == 0):
             y1 = [u(step,curtime, eps,0) for step in riarr]
             y2 = impicit[int(curtime / stept)]
+            print("y2 = ", y2)
             #y2 = explicit[int(curtime / stept)]
+            print(len(y2))
+            print(riarr)
+
             ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
             mpl.legend((ln0, ln1), ('явная', 'Аналитическое', "Явная"),
                        title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '

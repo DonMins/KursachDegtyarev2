@@ -58,11 +58,13 @@ def hI(ht, hr, ri):
 
 
 def xOy(args):
+    yu = 0
 
     stepr, stept, riarr = args[0], args[1], args[2]
     res = [np.zeros(riarr.__len__())]
+    len = riarr.__len__()
     for k in np.arange(1, int(180 / stept), 1):
-        len = riarr.__len__()-1
+
         ss = []
         j = 0
         for ri in riarr[0:len]:
@@ -90,9 +92,17 @@ def xOy(args):
             u[i, i] = pi(stepr, stept, riarr[i])
             u[i, i + 1] = -1*qi(stept, stepr, riarr[i])
 
-        temp = [i for i in np.linalg.solve(u, s).flat]
-        temp.append(temp[len-1])
+        if (yu==0):
+            print(u)
+
+        temp = [y for y in np.linalg.solve(u, s).flat]
         res.append(temp)
+        temp=[]
+        del s
+        if (yu == 0):
+            print(res)
+            yu=1
+
 
 
     return res
