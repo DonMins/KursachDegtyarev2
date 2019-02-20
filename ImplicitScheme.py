@@ -26,40 +26,78 @@ def gamma(ht, hr):
     return g * ht / (hr ** 2)
 
 
-def p0(ht, hr):
+def b0(ht, hr):
     return 1 + 4 * gamma(ht, hr) + d * ht
 
 
-def q0(ht, hr):
-    return 4 * gamma(ht, hr)
+def c0(ht, hr):
+    return -4 * gamma(ht, hr)
 
 
 def s0(u, ht):
     return u + ht * f_ri(0)
 
 
-def pi(hr, ht, ri):
+def b_i(hr, ht, ri):
     return 1 + 2 * gamma(ht, hr) + d * ht
 
 
-def hi(ht, hr, ri):
-    return gamma(ht, hr) - (gamma(ht, hr) * hr) / (2*ri)
+def a_i(ht, hr, ri):
+    return (gamma(ht, hr) * hr) / (2*ri) - gamma(ht, hr)
 
 
-def qi(ht, hr, ri):
-    return gamma(ht, hr) + (gamma(ht, hr) * hr )/( 2*ri)
+def c_i(ht, hr, ri):
+    return -gamma(ht, hr) - (gamma(ht, hr) * hr)/(2*ri)
 
 
-def si(u, ri, ht):
+def s_i(u, ri, ht):
     return u + ht * f_ri(ri)
 
-def hI(ht, hr, ri):
-    return 2*gamma(ht, hr)
+def a_I(ht, hr, ri):
+    return -2*gamma(ht, hr)
+
+def faster(args):
+    hr, ht, riarr = args[0], args[1], args[2]
+    res = [np.zeros(riarr.__len__())]
+    len = riarr.__len__()
+    coefficients_alpha_beta = [[0] * 2] * (len - 1)
+    u = []
+    values = np.zeros(len)
+
+    for k in np.arange(1, int(180 / ht), 1):
+        for i in np.arange(0, len, 1):
+            if(i == 0):
+                coefficients_alpha_beta[i] = [0, 0]
+                values[i] = 0
+            elif i == len - 1:
+                values[i] = 0 # надо посчитать чему наверное
+            else:
+                if i == 1:
+                    alpha0 = (-1 * c0(ht, hr)) / (b0(ht, hr))
+                    beta0 = (s0(0,ht)) / (b0(ht, hr))
+                    coefficients_alpha_beta[i] = [alpha0,beta0]
+
+            elif i == len - 2:
+            coefficients[i] = [-(((1 + 2 * gamma) * (1 + alp * h_x / k + c * h_x * h_x / (2 * k * h_t)) - gamma) / (
+                        -gamma * coefficients[i - 1][0])),
+                               ((values[i] + values[i] * (1 + 2 * gamma) * (c * h_x * h_x / (2 * k * h_t)) - (-gamma) *
+                                 coefficients[i - 1][1]) / (-gamma * coefficients[i - 1][0]))]
+        else:
+            A = - gamma
+            B = 1 + 2 * gamma
+            C = - gamma
+            F = values[i]
+            Alpha = - (C/ (B + A * coefficients_alpha_beta[i - 1][0]))
+            Betta = ((F - A * coefficients_alpha_beta[i - 1][1]) / (B + A * coefficients_alpha_beta[i - 1][0]))
+           coefficients_alpha_beta[i] = [Alpha, Betta]
+        for i in np.arange(len(x) - 2, -1, -1):
+            values[i] = coefficients_alpha_beta[i][0] * values[i + 1] + coefficients_alpha_beta[i][1]
+
+        return u
+
 
 
 def xOy(args):
-    yu = 0
-
     stepr, stept, riarr = args[0], args[1], args[2]
     res = [np.zeros(riarr.__len__())]
     len = riarr.__len__()
@@ -71,7 +109,7 @@ def xOy(args):
             if (ri == 0):
                 ss.append([s0(0, stept)])
             else:
-                ss.append([si(res[k - 1][j], ri, stept)])
+                ss.append([s_i(res[k - 1][j], ri, stept)])
             j += 1
 
         # правые части
@@ -81,28 +119,18 @@ def xOy(args):
         u = np.zeros((len, len))
 
         # граничные условия
-        u[0, 0] = p0(stept, stepr)
-        u[0, 1] = -1 * q0(stept, stepr)
-        u[len-1, len-1] = pi(stepr, stept, riarr[len-1])
-        u[len-1, len-2] = -1*hI(stept, stepr, riarr[len-1])
+        u[0, 0] = b0(stept, stepr)
+        u[0, 1] = c0(stept, stepr)
+        u[len-1, len-1] = b_i(stepr, stept, riarr[len - 1])
+        u[len-1, len-2] = a_I(stept, stepr, riarr[len - 1])
 
         # остальная система
         for i in np.arange(1, len-1, 1):
-            u[i, i - 1] = -1*hi(stept, stepr, riarr[i])
-            u[i, i] = pi(stepr, stept, riarr[i])
-            u[i, i + 1] = -1*qi(stept, stepr, riarr[i])
-
-        if (yu==0):
-            print(u)
+            u[i, i - 1] = a_i(stept, stepr, riarr[i])
+            u[i, i] = b_i(stepr, stept, riarr[i])
+            u[i, i + 1] = c_i(stept, stepr, riarr[i])
 
         temp = [y for y in np.linalg.solve(u, s).flat]
         res.append(temp)
-        temp=[]
-        del s
-        if (yu == 0):
-            print(res)
-            yu=1
-
-
 
     return res
