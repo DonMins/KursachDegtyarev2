@@ -61,7 +61,6 @@ def faster(args):
     hr, ht, riarr = args[0], args[1], args[2]
     res = [np.zeros(riarr.__len__())]
     len = riarr.__len__()
-    coefficients_alpha_beta = [[0] * 2] * (len )
     coefficients_alpha = [[0] * (len - 1)] * (int(180 / ht))
     coefficients_beta = [[0] * (len-1)] * (int(180 / ht))
     for k in np.arange(1, int(180 / ht), 1):
@@ -71,17 +70,15 @@ def faster(args):
                 alpha0 = (-1 * c0(ht, hr)) / (b0(ht, hr))
                 h = s_i(res[k - 1][i],riarr[i],ht)
                 beta0 = (h) / (b0(ht, hr))
-                #coefficients_alpha[k][i]=alpha0
+                coefficients_alpha[k][i]=alpha0
                 coefficients_beta[k][i]=beta0
-                #coefficients_alpha_beta[i] = [alpha0, beta0]
             if i == len - 1:
-               u[i] = (s_i(res[k - 1][i], riarr[i], ht)-a_I(ht,hr,riarr[i])*coefficients_beta[k][i - 1])/\
-                      ((a_I(ht,hr,riarr[i]))*coefficients_alpha[k][i - 1]+b_i(hr,ht,riarr[i]))
-
+                 u[i] =((s_i(res[k - 1][i], riarr[i], ht)) - a_I(ht,hr,riarr[i])*coefficients_beta[k][i - 1])/((a_I(ht,hr,riarr[i]))*coefficients_alpha[k][i - 1]+b_i(hr,ht,riarr[i]))
             if ((i!=0) and (i!= len-1)):
                 A = a_i(ht,hr,riarr[i])
-                B = b_i(ht,hr,riarr[i])
+                B = b_i(hr,ht,riarr[i])
                 C = c_i(ht,hr,riarr[i])
+
                 F = s_i(res[k - 1][i], riarr[i], ht)
                 Alpha = - (C/ (B + A * coefficients_alpha[k][i-1]))
                 Betta = ((F - A * coefficients_beta[k][i-1]) / (B + A * coefficients_alpha[k][i-1]))
@@ -89,17 +86,10 @@ def faster(args):
                 coefficients_beta[k][i] = Betta
 
         for i in np.arange(len - 2, -1, -1):
-           # u[i]=(coefficients_alpha_beta[i][0] * u[i + 1] + coefficients_alpha_beta[i][1])
-           u[i] = (coefficients_alpha[k][i] * u[i + 1] + coefficients_beta[k][i])
+         u[i] = (coefficients_alpha[k][i] * u[i + 1] + coefficients_beta[k][i])
 
         res.append(u)
-        if (k == 1):
-            print(u)
-
-
     return res
-
-
 
 def xOy(args):
     xu = 0
@@ -132,10 +122,8 @@ def xOy(args):
             u[i, i] = b_i(stepr, stept, riarr[i])
             u[i, i + 1] = c_i(stept, stepr, riarr[i])
 
-
         temp = [y for y in np.linalg.solve(u, s).flat]
         res.append(temp)
-        if(k==1):
-            print("xoy",temp)
+
 
     return res

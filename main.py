@@ -286,6 +286,7 @@ if __name__ == '__main__':
         t1= time.time()
 
         impicit = ImplicitScheme.faster(args)
+        impicit2 = ImplicitScheme.xOy(args)
 
         print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - t1))
 
@@ -298,11 +299,12 @@ if __name__ == '__main__':
         while(moment == 0):
             y1 = [u(step,curtime, eps,0) for step in riarr]
             y2 = impicit[int(curtime / stept)]
+            y3 = impicit2[int(curtime / stept)]
 
             #y3 = explicit[int(curtime / stept)]
 
-            ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
-            mpl.legend((ln0, ln1), ('Неявная', 'Аналитическое'),
+            ln0, ln1,ln2 = mpl.plot(riarr,y2,riarr,y1,riarr, y3)
+            mpl.legend((ln0, ln1,ln2), ('Неявная', 'Аналитическое','1'),
                        title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
                              'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
                                                                 parameter_array['alf'], parameter_array['c'],
