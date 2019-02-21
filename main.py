@@ -281,29 +281,28 @@ if __name__ == '__main__':
         print("Подождите, пожалуйста, выполняются вычисления...")
 
         riarr = [st for st in np.arange(0, parameter_array['R']+stepr, stepr)]
-        print(riarr)
+
         args =(stepr, stept, riarr)
         t1= time.time()
 
-        impicit = ImplicitScheme.xOy(args)
+        impicit = ImplicitScheme.faster(args)
 
         print('Время работы неявной схемы' + ' {0:.2f}'.format(time.time() - t1))
 
         t2 = time.time()
 
-            #explicit = ExplictitScheme.xOy(args)
+        explicit = ExplictitScheme.xOy(args)
+
         print('Время работы явной схемы' + ' {0:.2f}'.format(time.time() - t2))
         moment=0
         while(moment == 0):
             y1 = [u(step,curtime, eps,0) for step in riarr]
             y2 = impicit[int(curtime / stept)]
-            print("y2 = ", y2)
-            #y2 = explicit[int(curtime / stept)]
-            print(len(y2))
-            print(riarr)
+
+            #y3 = explicit[int(curtime / stept)]
 
             ln0, ln1 = mpl.plot(riarr,y2,riarr,y1)
-            mpl.legend((ln0, ln1), ('явная', 'Аналитическое', "Явная"),
+            mpl.legend((ln0, ln1), ('Неявная', 'Аналитическое'),
                        title='R: {0}, l: {1}, k: {2}, alf: {3}, c: {4}, betta: {5}, P: {6}, a: {7} \n step for R : {8} \n step '
                              'for T: {9} \n time = {10}'.format(parameter_array['R'], parameter_array['l'], parameter_array['k'],
                                                                 parameter_array['alf'], parameter_array['c'],

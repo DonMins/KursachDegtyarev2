@@ -68,13 +68,15 @@ def faster(args):
         for i in np.arange(0, len, 1):
             if(i == 0):
                 alpha0 = (-1 * c0(ht, hr)) / (b0(ht, hr))
-                beta0 = (s0(0, ht)) / (b0(ht, hr))
+                print(alpha0)
+                h = s_i(res[k - 1][i],riarr[i],ht)
+                beta0 = (h) / (b0(ht, hr))
                 coefficients_alpha_beta[i] = [alpha0, beta0]
-            elif i == len - 1:
-               u[i] =  (s_i(res[k - 1][i], riarr[i], ht)-a_I(ht,hr,riarr[i]*coefficients_alpha_beta[i - 1][1]))/\
-                       (a_I(ht,hr,riarr[i])*coefficients_alpha_beta[i - 1][0]+b_i(hr,ht,riarr[i]))
+            if i == len - 1:
+               u[i] = (s_i(res[k - 1][i], riarr[i], ht)-a_I(ht,hr,riarr[i])*coefficients_alpha_beta[i - 1][1])/\
+                      ((a_I(ht,hr,riarr[i]))*coefficients_alpha_beta[i - 1][0]+b_i(hr,ht,riarr[i]))
 
-            else:
+            if ((i!=0) and (i!= len-1)):
                 A = a_i(ht,hr,riarr[i])
                 B = b_i(ht,hr,riarr[i])
                 C = c_i(ht,hr,riarr[i])
@@ -86,7 +88,7 @@ def faster(args):
         for i in np.arange(len - 2, -1, -1):
             u[i]=(coefficients_alpha_beta[i][0] * u[i + 1] + coefficients_alpha_beta[i][1])
         res.append(u)
-        print("u= ",u)
+
 
     return res
 
@@ -97,30 +99,17 @@ def xOy(args):
     stepr, stept, riarr = args[0], args[1], args[2]
     res = [np.zeros(riarr.__len__())]
     len = riarr.__len__()
-    s = []
-
 
     for k in np.arange(1, int(180 / stept), 1):
+        ss = []
         j = 0
         for ri in riarr[0:len]:
-            if(xu==0):
-                xu =xu+1
-                s.append([s0(0, stept)])
-            if ((ri==0) and (k>1)):
-
-                my_list = np.array(s[k - 1]).astype(np.float)
-                g = float(my_list)
-                print("gfg0",g)
-                s.append([s0(g, stept)])
-            if (ri!=0):
-                s.append([s_i(res[k - 1][j], ri, stept)])
+            ss.append([s_i(res[k - 1][j], ri, stept)])
             j += 1
 
         # правые части
+        s = np.matrix(ss)
 
-
-        if (k==2):
-            print("S = ", s)
         # типо сетка
         u = np.zeros((len, len))
 
@@ -137,14 +126,7 @@ def xOy(args):
             u[i, i + 1] = c_i(stept, stepr, riarr[i])
 
 
-        ss = np.array(s[k-1:len])
-
-        print("u = ", u)
-
-        print("ss = ", ss)
-        temp = [y for y in np.linalg.solve(u, ss).flat]
-        if (k==1):
-            print("temp = ",temp)
+        temp = [y for y in np.linalg.solve(u, s).flat]
         res.append(temp)
 
     return res
